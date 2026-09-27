@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADMS Cruscotto Macchina</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F4F3; --card:#FFFFFF; --ink:#16232A; --ink2:#4E5B62; --muted:#8A969C; --line:#DCE2E4; --line2:#EEF1F2;
+  --brand:#1F3B47; --brand-ink:#EAF2F4; --accent:#E07A3F;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --good:#008300; --warn:#c98500; --crit:#c62828; --good-bg:#E6F4E6; --warn-bg:#FFF3DC; --crit-bg:#FBE4E4;
+  --add:#5B3FB8; --add-bg:#EEE9FA;
+  --shadow:0 1px 2px rgba(22,35,42,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#131A1E; --card:#1C2529; --ink:#EDF2F3; --ink2:#B7C3C8; --muted:#7F8D93; --line:#2E3B41; --line2:#253136;
+    --brand:#0F1E26; --brand-ink:#EAF2F4; --accent:#F0A36A;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --good:#4CAF50; --warn:#F0B84A; --crit:#EF6B6B; --good-bg:#1B2E1C; --warn-bg:#33291A; --crit-bg:#3A1F1F;
+    --add:#B39DF0; --add-bg:#2A2340;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#131A1E; --card:#1C2529; --ink:#EDF2F3; --ink2:#B7C3C8; --muted:#7F8D93; --line:#2E3B41; --line2:#253136;
+  --brand:#0F1E26; --brand-ink:#EAF2F4; --accent:#F0A36A;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --good:#4CAF50; --warn:#F0B84A; --crit:#EF6B6B; --good-bg:#1B2E1C; --warn-bg:#33291A; --crit-bg:#3A1F1F;
+  --add:#B39DF0; --add-bg:#2A2340;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Barlow,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.4}
+.top{background:var(--brand);color:var(--brand-ink);padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.top .logo{width:42px;height:34px;border:1px dashed rgba(255,255,255,.45);border-radius:6px;display:grid;place-items:center;font:600 9px/1 Barlow,sans-serif;letter-spacing:.06em;opacity:.8;text-align:center}
+.top h1{font-family:"Barlow Condensed",Barlow,sans-serif;font-size:22px;font-weight:600;margin:0;letter-spacing:.01em}
+.top .sub{font-size:12px;opacity:.75;margin:0}
+.top .spacer{flex:1}
+.seg{display:inline-flex;border:1px solid rgba(255,255,255,.35);border-radius:8px;overflow:hidden}
+.seg button{background:transparent;color:var(--brand-ink);border:0;padding:8px 14px;font:500 13px Barlow,sans-serif;cursor:pointer}
+.seg button.on{background:var(--brand-ink);color:var(--brand)}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.seg.small button{padding:6px 10px;font-size:12px}
+.wrap{max-width:1280px;margin:0 auto;padding:16px 16px 40px}
+.strip{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:12px;color:var(--ink2);margin-bottom:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-weight:600;font-size:12px}
+.pill.run{background:var(--good-bg);color:var(--good)}
+.pill.stop{background:var(--crit-bg);color:var(--crit)}
+.pill.chg{background:var(--warn-bg);color:var(--warn)}
+.pill i{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
+.pill.run i{animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.pill.run i{animation:none}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);min-width:0}
+.kpi .l{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.kpi .v{font-family:"Barlow Condensed",sans-serif;font-size:34px;font-weight:600;line-height:1.05;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:15px;font-weight:500;color:var(--ink2);margin-left:3px}
+.kpi .d{font-size:12px;color:var(--ink2);margin-top:4px}
+.kpi .d.g{color:var(--good)} .kpi .d.w{color:var(--warn)} .kpi .d.c{color:var(--crit)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);grid-column:span 6;min-width:0;position:relative}
+.card.w4{grid-column:span 4}.card.w8{grid-column:span 8}.card.w12{grid-column:span 12}
+@media (max-width:900px){.card,.card.w4,.card.w8{grid-column:span 12}}
+.card h2{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:600;margin:0 0 2px;letter-spacing:.01em}
+.card .hint{font-size:12px;color:var(--muted);margin:0 0 10px}
+.src{position:absolute;top:12px;right:14px;font:500 10px "DM Mono",monospace;letter-spacing:.04em;padding:3px 7px;border-radius:5px;background:var(--line2);color:var(--ink2);text-transform:uppercase}
+.src.add{background:var(--add-bg);color:var(--add)}
+.card.added{border-color:var(--add)}
+canvas{width:100%;height:auto;display:block}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--card);font:12px Barlow,sans-serif;padding:6px 9px;border-radius:6px;opacity:0;transition:opacity .08s;z-index:20;white-space:nowrap;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{width:10px;height:10px;border-radius:2px;display:inline-block}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line2);vertical-align:top;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.sev{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.sev.c{background:var(--crit-bg);color:var(--crit)}.sev.w{background:var(--warn-bg);color:var(--warn)}.sev.i{background:var(--line2);color:var(--ink2)}
+.alerts{display:flex;flex-direction:column;gap:8px}
+.al{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:8px;border:1px solid var(--line);border-left:4px solid var(--warn)}
+.al.c{border-left-color:var(--crit)}.al.g{border-left-color:var(--good)}
+.al b{display:block;font-size:13px}.al span{font-size:12px;color:var(--ink2)}
+.al .who{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;font-size:13px}
+.bar .t{height:14px;background:var(--line2);border-radius:3px;overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--s1);border-radius:0 3px 3px 0}
+.bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
+@media (max-width:520px){.bar{grid-template-columns:110px 1fr 50px}}
+.foot{margin-top:18px;font-size:12px;color:var(--muted);line-height:1.5;max-width:70ch}
+.mode-note{display:none;background:var(--add-bg);color:var(--add);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;line-height:1.45}
+body.add .mode-note{display:block}
+.only-add{display:none}
+body.add .only-add{display:block}
+body.add .card.only-add{display:block}
+.gauge{display:flex;align-items:center;gap:16px}
+.gauge .ring{width:92px;height:92px;flex:none}
+.gauge .txt{font-size:13px;color:var(--ink2);line-height:1.5}
+.gauge .txt b{font-family:"Barlow Condensed",sans-serif;font-size:28px;color:var(--ink);font-weight:600}
+.copy{font-size:12px;color:var(--ink2);margin-top:8px;line-height:1.45}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo" data-i="logo">VOSTRO<br>LOGO</div>
+  <div>
+    <h1 data-i="title">ADMS ORBITALE · Cruscotto macchina</h1>
+    <p class="sub" data-i="subtitle">Bozza per parlarne · dati simulati · turno del mattino</p>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg" role="group" aria-label="mode">
+    <button id="mA" class="on" data-i="modeA">Oggi · segnali del PLC</button>
+    <button id="mB" data-i="modeB">Con sensori a basso costo</button>
+  </div>
+  <div class="seg small" role="group" aria-label="lang">
+    <button id="lIT" class="on">IT</button>
+    <button id="lFR">FR</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="strip">
+    <span class="pill run" id="statePill"><i></i><span data-i="stateRun">In produzione</span></span>
+    <span><b data-i="recipe">Ricetta</b>: <span id="recipeTxt">Flacone 50 ml · Ø 38 · tappo a vite 24/410 · crema viso</span></span>
+    <span><b data-i="shift">Turno</b>: 06:00 – 14:00</span>
+    <span><b data-i="now">Ora</b>: <span id="clock">11:42</span></span>
+  </div>
+
+  <div class="mode-note" data-i="modeNote">Modalità con sensori aggiuntivi: le schede con il bordo viola usano un sensore da aggiungere alla macchina (pressione aria, corrente, vibrazione, livello, fotocellula, temperatura). Costo indicativo per il kit: qualche centinaio di euro. Le altre schede restano identiche.</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card w8">
+      <span class="src" data-i="srcPlc">PLC</span>
+      <h2 data-i="cadTitle">Cadenza nel turno</h2>
+      <p class="hint" data-i="cadHint">Flaconi/ora ogni 5 minuti. Linea tratteggiata: obiettivo della ricetta (800). Le cadute coincidono con fermi e cambi formato.</p>
+      <canvas id="cCad" width="900" height="260"></canvas>
+      <div class="legend"><span><b style="background:var(--s1)"></b><span data-i="legCad">Cadenza reale</span></span><span><b style="background:var(--muted)"></b><span data-i="legTarget">Obiettivo ricetta</span></span></div>
+    </div>
+
+    <div class="card w4">
+      <span class="src" data-i="srcPlc">PLC</span>
+      <h2 data-i="stTitle">Stati macchina</h2>
+      <p class="hint" data-i="stHint">Da inizio turno. Il cambio formato dichiarato è sotto i 2 minuti: qui si vede quanto dura davvero.</p>
+      <canvas id="cStates" width="420" height="120"></canvas>
+      <div class="bars" id="stBars" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card w4">
+      <span class="src" data-i="srcPlc">PLC</span>
+      <h2 data-i="tcTitle">Tempo ciclo</h2>
+      <p class="hint" data-i="tcHint">Distribuzione degli ultimi 500 cicli. Una coda a destra dice che qualcosa rallenta il riempimento.</p>
+      <canvas id="cCycle" width="420" height="200"></canvas>
+    </div>
+
+    <div class="card w4">
+      <span class="src" data-i="srcPlc">PLC</span>
+      <h2 data-i="alTitle">Allarmi per causa</h2>
+      <p class="hint" data-i="alHint">Ultimi 7 giorni. Il primo della lista è quello su cui lavorare.</p>
+      <div class="bars" id="alBars"></div>
+    </div>
+
+    <div class="card w4">
+      <span class="src" data-i="srcPlc">PLC</span>
+      <h2 data-i="evTitle">Ultimi eventi</h2>
+      <p class="hint" data-i="evHint">Allarmi e cambi di stato con l'ora. Sul telefono del tecnico arrivano solo quelli rossi.</p>
+      <div class="alerts" id="events"></div>
+    </div>
+
+    <!-- sensor cards -->
+    <div class="card w4 added only-add">
+      <span class="src add" data-i="srcAdd">+ sensore</span>
+      <h2 data-i="airTitle">Pressione aria</h2>
+      <p class="hint" data-i="airHint">Trasduttore 0-10 bar sull'ingresso (≈ 40 €). Sotto 5,5 bar l'avvitatore perde coppia prima che il PLC se ne accorga.</p>
+      <canvas id="cAir" width="420" height="180"></canvas>
+    </div>
+
+    <div class="card w4 added only-add">
+      <span class="src add" data-i="srcAdd">+ sensore</span>
+      <h2 data-i="curTitle">Corrente avvitatore</h2>
+      <p class="hint" data-i="curHint">Pinza amperometrica sul motore (≈ 30 €). Il picco per ciclo è un indice della coppia: se sale, il tappo o la filettatura sono cambiati.</p>
+      <canvas id="cCur" width="420" height="180"></canvas>
+    </div>
+
+    <div class="card w4 added only-add">
+      <span class="src add" data-i="srcAdd">+ sensore</span>
+      <h2 data-i="vibTitle">Vibrazione pompa</h2>
+      <p class="hint" data-i="vibHint">Accelerometro sul corpo pompa (≈ 25 €). Media giornaliera: la salita lenta anticipa la guarnizione da cambiare.</p>
+      <canvas id="cVib" width="420" height="180"></canvas>
+    </div>
+
+    <div class="card w4 added only-add">
+      <span class="src add" data-i="srcAdd">+ sensore</span>
+      <h2 data-i="lvlTitle">Livello prodotto</h2>
+      <p class="hint" data-i="lvlHint">Sonda di livello nel serbatoio (≈ 60 €). Autonomia calcolata sulla cadenza reale.</p>
+      <div class="gauge"><canvas class="ring" id="cLvl" width="184" height="184"></canvas><div class="txt" id="lvlTxt"></div></div>
+    </div>
+
+    <div class="card w4 added only-add">
+      <span class="src add" data-i="srcAdd">+ sensore</span>
+      <h2 data-i="rejTitle">Flaconi non conformi</h2>
+      <p class="hint" data-i="rejHint">Fotocellula in uscita (≈ 20 €): conta i flaconi che passano. La differenza con il contatore del PLC sono i flaconi tolti a mano.</p>
+      <canvas id="cRej" width="420" height="180"></canvas>
+    </div>
+
+    <div class="card w4 added only-add">
+      <span class="src add" data-i="srcAdd">+ sensore</span>
+      <h2 data-i="tmpTitle">Temperatura prodotto</h2>
+      <p class="hint" data-i="tmpHint">PT100 nel serbatoio (≈ 15 €). Sotto i 20 °C la crema è più viscosa e il tempo ciclo si allunga.</p>
+      <canvas id="cTmp" width="420" height="180"></canvas>
+    </div>
+
+    <div class="card w12 added only-add">
+      <span class="src add" data-i="srcAdd">+ sensore</span>
+      <h2 data-i="mtTitle">Manutenzione anticipata</h2>
+      <p class="hint" data-i="mtHint">Regole semplici sui sensori aggiunti. Non fermano niente: avvisano il tecnico sul telefono prima del fermo.</p>
+      <div style="overflow-x:auto"><table id="mtTable"></table></div>
+    </div>
+
+    <div class="card w12">
+      <span class="src" data-i="srcPlc">PLC</span>
+      <h2 data-i="wkTitle">Settimana: flaconi per giorno e tempo perso</h2>
+      <p class="hint" data-i="wkHint">Flaconi buoni per giorno; il tempo perso è la somma di fermi e cambi formato. Il lunedì dice quanto costa un cambio prodotto mal preparato.</p>
+      <canvas id="cWeek" width="1200" height="220"></canvas>
+      
+    </div>
+  </div>
+
+  <p class="foot" data-i="foot">Dati simulati per una ORBITALE su crema viso, flacone 50 ml. Modalità "Oggi": tutto quello che c'è già nel PLC (contatore, cadenza, tempo ciclo, stati, ricetta, allarmi). Modalità "Con sensori": sei sensori da poche decine di euro l'uno, letti da un piccolo gateway e mostrati nella stessa pagina. Il software è il nostro; la macchina resta la vostra.</p>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+/* ---------- i18n ---------- */
+var I18N={
+ it:{logo:'VOSTRO<br>LOGO',title:'ADMS ORBITALE · Cruscotto macchina',subtitle:'Bozza per parlarne · dati simulati · turno del mattino',modeA:'Oggi · segnali del PLC',modeB:'Con sensori a basso costo',stateRun:'In produzione',recipe:'Ricetta',shift:'Turno',now:'Ora',
+  modeNote:'Modalità con sensori aggiuntivi: le schede con il bordo viola usano un sensore da aggiungere alla macchina (pressione aria, corrente, vibrazione, livello, fotocellula, temperatura). Costo indicativo per il kit: qualche centinaio di euro. Le altre schede restano identiche.',
+  srcPlc:'PLC',srcAdd:'+ sensore',cadTitle:'Cadenza nel turno',cadHint:'Flaconi/ora ogni 5 minuti. Linea tratteggiata: obiettivo della ricetta (800). Le cadute coincidono con fermi e cambi formato.',legCad:'Cadenza reale',legTarget:'Obiettivo ricetta',
+  stTitle:'Stati macchina',stHint:'Da inizio turno. Il cambio formato dichiarato è sotto i 2 minuti: qui si vede quanto dura davvero.',tcTitle:'Tempo ciclo',tcHint:'Distribuzione degli ultimi 500 cicli. Una coda a destra dice che qualcosa rallenta il riempimento.',
+  alTitle:'Allarmi per causa',alHint:'Ultimi 7 giorni. Il primo della lista è quello su cui lavorare.',evTitle:'Ultimi eventi',evHint:'Allarmi e cambi di stato con l\'ora. Sul telefono del tecnico arrivano solo quelli rossi.',
+  airTitle:'Pressione aria',airHint:'Trasduttore 0-10 bar sull\'ingresso (≈ 40 €). Sotto 5,5 bar l\'avvitatore perde coppia prima che il PLC se ne accorga.',curTitle:'Corrente avvitatore',curHint:'Pinza amperometrica sul motore (≈ 30 €). Il picco per ciclo è un indice della coppia: se sale, il tappo o la filettatura sono cambiati.',
+  vibTitle:'Vibrazione pompa',vibHint:'Accelerometro sul corpo pompa (≈ 25 €). Media giornaliera: la salita lenta anticipa la guarnizione da cambiare.',lvlTitle:'Livello prodotto',lvlHint:'Sonda di livello nel serbatoio (≈ 60 €). Autonomia calcolata sulla cadenza reale.',
+  rejTitle:'Flaconi non conformi',rejHint:'Fotocellula in uscita (≈ 20 €): conta i flaconi che passano. La differenza con il contatore del PLC sono i flaconi tolti a mano.',tmpTitle:'Temperatura prodotto',tmpHint:'PT100 nel serbatoio (≈ 15 €). Sotto i 20 °C la crema è più viscosa e il tempo ciclo si allunga.',
+  mtTitle:'Manutenzione anticipata',mtHint:'Regole semplici sui sensori aggiunti. Non fermano niente: avvisano il tecnico sul telefono prima del fermo.',wkTitle:'Settimana: flaconi per giorno e tempo perso',wkHint:'Flaconi buoni per giorno; il tempo perso è la somma di fermi e cambi formato. Il lunedì dice quanto costa un cambio prodotto mal preparato.',legGood:'Flaconi buoni',legLost:'Tempo perso (min)',
+  foot:'Dati simulati per una ORBITALE su crema viso, flacone 50 ml. Modalità "Oggi": tutto quello che c\'è già nel PLC (contatore, cadenza, tempo ciclo, stati, ricetta, allarmi). Modalità "Con sensori": sei sensori da poche decine di euro l\'uno, letti da un piccolo gateway e mostrati nella stessa pagina. Il software è il nostro; la macchina resta la vostra.',
+  k_count:'Flaconi oggi',k_countd:'obiettivo turno 5.600',k_cad:'Cadenza ora',k_cadd:'obiettivo 800',k_cycle:'Tempo ciclo medio',k_cycled:'ricetta 4,5 s',k_avail:'Disponibilità',k_availd:'fermi + cambi: 41 min',k_chg:'Ultimo cambio formato',k_chgd:'dichiarato < 2 min',k_alarm:'Allarmi oggi',k_alarmd:'di cui 1 rosso',
+  k_air:'Aria in ingresso',k_aird:'minimo 5,5 bar',k_rej:'Non conformi',k_rejd:'tolti a mano',k_lvl:'Autonomia serbatoio',k_lvld:'alla cadenza attuale',
+  st_run:'Produzione',st_stop:'Fermo',st_chg:'Cambio formato',st_idle:'Attesa operatore',
+  al:['Flacone mancante in stazione','Tappo non avvitato','Serbatoio in riserva','Pressione aria bassa','Porta aperta','Etichetta non rilevata'],
+  ev:[['11:38','Tappo non avvitato · ciclo 4.812','w','operatore'],['10:55','Cambio formato 38 → 42 mm · 2 min 40 s','i','operatore'],['09:20','Pressione aria sotto 5,5 bar · 4 min','c','tecnico'],['08:05','Serbatoio in riserva · rabbocco','w','operatore'],['06:02','Avvio turno · ricetta crema viso 50 ml','g','']],
+  mt:[['Pressione aria','< 5,5 bar per più di 60 s','Compressore / filtro','oggi 09:20','w'],['Corrente avvitatore','picco +15 % su 100 cicli','Tappo o pinza usurata','+9 % questa settimana','w'],['Vibrazione pompa','media +30 % su 7 giorni','Guarnizione pompa','+12 % in 5 giorni','i'],['Temperatura prodotto','< 20 °C a inizio turno','Prodotto freddo: ciclo lento','18,5 °C lunedì','i'],['Fotocellula uscita','scarti > 1,5 % in 1 h','Regolazione riempitrice','0,8 %','g']],
+  mth:['Sensore','Regola','Cosa indica','Ultimo caso','Stato'],
+  lvl:function(p,l,h,m){return '<b>'+p+' %</b> · '+l+' l<br>'+h+' h '+m+' min';},
+  days:['Lun','Mar','Mer','Gio','Ven'],cyc:'cicli',fl:'flaconi',min:'min',bar:'bar',amp:'A',mms:'mm/s',deg:'°C',pct:'%',h:'h'},
+ fr:{logo:'VOTRE<br>LOGO',title:'ADMS ORBITALE · Tableau de bord machine',subtitle:'Ébauche pour en parler · données simulées · équipe du matin',modeA:'Aujourd\'hui · signaux de l\'automate',modeB:'Avec capteurs à bas coût',stateRun:'En production',recipe:'Recette',shift:'Équipe',now:'Heure',
+  modeNote:'Mode capteurs additionnels : les cartes à bord violet utilisent un capteur à ajouter sur la machine (pression d\'air, courant, vibration, niveau, cellule, température). Coût indicatif du kit : quelques centaines d\'euros. Les autres cartes ne changent pas.',
+  srcPlc:'AUTOMATE',srcAdd:'+ capteur',cadTitle:'Cadence sur l\'équipe',cadHint:'Flacons/heure toutes les 5 minutes. Pointillé : objectif de la recette (800). Les chutes correspondent aux arrêts et aux changements de format.',legCad:'Cadence réelle',legTarget:'Objectif recette',
+  stTitle:'États machine',stHint:'Depuis le début de l\'équipe. Le changement de format annoncé est sous 2 minutes : ici on voit ce qu\'il dure vraiment.',tcTitle:'Temps de cycle',tcHint:'Distribution des 500 derniers cycles. Une traîne à droite dit que quelque chose ralentit le remplissage.',
+  alTitle:'Alarmes par cause',alHint:'7 derniers jours. La première de la liste est celle à traiter.',evTitle:'Derniers événements',evHint:'Alarmes et changements d\'état avec l\'heure. Sur le téléphone du technicien n\'arrivent que les rouges.',
+  airTitle:'Pression d\'air',airHint:'Transducteur 0-10 bar à l\'entrée (≈ 40 €). Sous 5,5 bar la visseuse perd du couple avant que l\'automate ne s\'en aperçoive.',curTitle:'Courant visseuse',curHint:'Pince ampèremétrique sur le moteur (≈ 30 €). Le pic par cycle est un indice du couple : s\'il monte, le bouchon ou le filetage a changé.',
+  vibTitle:'Vibration pompe',vibHint:'Accéléromètre sur le corps de pompe (≈ 25 €). Moyenne journalière : la montée lente annonce le joint à remplacer.',lvlTitle:'Niveau produit',lvlHint:'Sonde de niveau dans la cuve (≈ 60 €). Autonomie calculée sur la cadence réelle.',
+  rejTitle:'Flacons non conformes',rejHint:'Cellule en sortie (≈ 20 €) : compte les flacons qui passent. L\'écart avec le compteur de l\'automate, ce sont les flacons retirés à la main.',tmpTitle:'Température produit',tmpHint:'PT100 dans la cuve (≈ 15 €). Sous 20 °C la crème est plus visqueuse et le cycle s\'allonge.',
+  mtTitle:'Maintenance anticipée',mtHint:'Règles simples sur les capteurs ajoutés. Elles n\'arrêtent rien : elles préviennent le technicien sur son téléphone avant l\'arrêt.',wkTitle:'Semaine : flacons par jour et temps perdu',wkHint:'Flacons bons par jour ; le temps perdu est la somme des arrêts et des changements de format. Le lundi dit ce que coûte un changement de produit mal préparé.',legGood:'Flacons bons',legLost:'Temps perdu (min)',
+  foot:'Données simulées pour une ORBITALE sur crème visage, flacon 50 ml. Mode « Aujourd\'hui » : tout ce qui est déjà dans l\'automate (compteur, cadence, temps de cycle, états, recette, alarmes). Mode « Avec capteurs » : six capteurs à quelques dizaines d\'euros pièce, lus par une petite passerelle et affichés sur la même page. Le logiciel est le nôtre ; la machine reste la vôtre.',
+  k_count:'Flacons aujourd\'hui',k_countd:'objectif équipe 5 600',k_cad:'Cadence actuelle',k_cadd:'objectif 800',k_cycle:'Temps de cycle moyen',k_cycled:'recette 4,5 s',k_avail:'Disponibilité',k_availd:'arrêts + changements : 41 min',k_chg:'Dernier changement de format',k_chgd:'annoncé < 2 min',k_alarm:'Alarmes aujourd\'hui',k_alarmd:'dont 1 rouge',
+  k_air:'Air en entrée',k_aird:'minimum 5,5 bar',k_rej:'Non conformes',k_rejd:'retirés à la main',k_lvl:'Autonomie cuve',k_lvld:'à la cadence actuelle',
+  st_run:'Production',st_stop:'Arrêt',st_chg:'Changement de format',st_idle:'Attente opérateur',
+  al:['Flacon absent en poste','Bouchon non vissé','Cuve en réserve','Pression d\'air basse','Porte ouverte','Étiquette non détectée'],
+  ev:[['11:38','Bouchon non vissé · cycle 4 812','w','opérateur'],['10:55','Changement de format 38 → 42 mm · 2 min 40 s','i','opérateur'],['09:20','Pression d\'air sous 5,5 bar · 4 min','c','technicien'],['08:05','Cuve en réserve · remplissage','w','opérateur'],['06:02','Début d\'équipe · recette crème visage 50 ml','g','']],
+  mt:[['Pression d\'air','< 5,5 bar pendant plus de 60 s','Compresseur / filtre','aujourd\'hui 09:20','w'],['Courant visseuse','pic +15 % sur 100 cycles','Bouchon ou pince usée','+9 % cette semaine','w'],['Vibration pompe','moyenne +30 % sur 7 jours','Joint de pompe','+12 % en 5 jours','i'],['Température produit','< 20 °C en début d\'équipe','Produit froid : cycle lent','18,5 °C lundi','i'],['Cellule sortie','rebuts > 1,5 % en 1 h','Réglage remplisseuse','0,8 %','g']],
+  mth:['Capteur','Règle','Ce que ça indique','Dernier cas','État'],
+  lvl:function(p,l,h,m){return '<b>'+p+' %</b> · '+l+' l<br>'+h+' h '+m+' min';},
+  days:['Lun','Mar','Mer','Jeu','Ven'],cyc:'cycles',fl:'flacons',min:'min',bar:'bar',amp:'A',mms:'mm/s',deg:'°C',pct:'%',h:'h'}
+};
+var LANG='it', ADD=false, T=I18N.it;
+
+/* ---------- seeded data ---------- */
+function rng(seed){return function(){seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296;};}
+var R=rng(7);
+/* shift 06:00-11:45, 5-min slots = 69 points; states timeline */
+var SEG=[['run',0,26],['stop',26,28],['run',28,40],['chg',40,41],['run',41,58],['stop',58,60],['run',60,69]]; /* slot indices; stop @08:10 (reserve), 09:20 (air) */
+var STATE=[];SEG.forEach(function(s){for(var i=s[1];i<s[2];i++)STATE[i]=s[0];});
+var CAD=STATE.map(function(s,i){if(s!=='run')return s==='chg'?120:0;var base=790+Math.sin(i/6)*35+(R()-.5)*60;if(i>41&&i<47)base-=90;return Math.round(base);});
+var AIR=CAD.map(function(c,i){var p=6.4+(R()-.5)*.25-(c>700?.15:0);if(i>=56&&i<60)p=5.1+(R()-.5)*.2;if(i>=60)p=6.2+(R()-.5)*.2;return +p.toFixed(2);});
+var CUR=[];for(var d=0;d<7;d++){var base=2.1+d*.03;for(var k=0;k<20;k++)CUR.push(+(base+(R()-.5)*.12+(d===6&&k>14?.2:0)).toFixed(2));}
+var VIB=[];for(var d=0;d<30;d++)VIB.push(+(1.8+d*.022+(R()-.5)*.12).toFixed(2));
+var TMP=CAD.map(function(c,i){return +(18.4+Math.min(i,30)/30*4.2+(R()-.5)*.3).toFixed(1);});
+var REJ=[];for(var h=0;h<6;h++)REJ.push({plc:h===4?520:h===1?610:h===3?640:660,phot:h===4?512:h===1?604:h===3?629:654});
+var CYC=[];for(var i=0;i<500;i++){var v=4.5+(R()+R()+R()-1.5)*.35;if(R()<.08)v+=.9+R()*1.2;CYC.push(v);}
+var WEEK=[[4380,96],[5240,38],[5410,31],[5180,44],[5520,26]];
+var ALARMS=[14,9,6,4,3,2];
+
+/* ---------- helpers ---------- */
+var tip=document.getElementById('tip');
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function fmt(n){return n.toLocaleString(LANG==='fr'?'fr-FR':'it-IT');}
+function setup(id){var c=document.getElementById(id);var ctx=c.getContext('2d');var dpr=window.devicePixelRatio||1;var W=c.width,H=c.height;c.style.aspectRatio=W+'/'+H;c.width=W*dpr;c.height=H*dpr;ctx.scale(dpr,dpr);ctx.font='12px Barlow, sans-serif';return {c:c,ctx:ctx,W:W,H:H};}
+function hover(c,fn){var W=c.c.width/(window.devicePixelRatio||1);c.c.onmousemove=function(e){var r=c.c.getBoundingClientRect();var x=(e.clientX-r.left)/r.width*W,y=(e.clientY-r.top)/r.height*c.H;var t=fn(x,y);if(t){tip.innerHTML=t;tip.style.opacity=1;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-30)+'px';}else tip.style.opacity=0;};c.c.onmouseleave=function(){tip.style.opacity=0;};}
+function grid(g,x0,y0,x1,y1,ys,fmtY){var ctx=g.ctx;ctx.strokeStyle=css('--line2');ctx.lineWidth=1;ctx.fillStyle=css('--muted');ctx.textAlign='right';ctx.textBaseline='middle';ys.forEach(function(v){var y=v[0];ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.fillText(fmtY?fmtY(v[1]):v[1],x0-6,y);});}
+function slotTime(i){var m=360+i*5;return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+m%60).slice(-2);}
+
+/* ---------- charts ---------- */
+function drawLine(id,data,opt){var g=setup(id),ctx=g.ctx,W=g.W,H=g.H,x0=40,y0=12,x1=W-10,y1=H-24;var min=opt.min,max=opt.max;var n=data.length;var X=function(i){return x0+(x1-x0)*i/(n-1);},Y=function(v){return y1-(y1-y0)*(v-min)/(max-min);};
+  var ticks=[];for(var k=0;k<=4;k++){var v=min+(max-min)*k/4;ticks.push([Y(v),v]);}grid(g,x0,y0,x1,y1,ticks,opt.fmtY);
+  ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle=css('--muted');(opt.xlabels||[]).forEach(function(l){ctx.fillText(l[1],X(l[0]),y1+6);});
+  if(opt.band){ctx.fillStyle=css('--crit-bg');ctx.fillRect(x0,Y(opt.band[1]),x1-x0,Y(opt.band[0])-Y(opt.band[1]));}
+  if(opt.target!=null){ctx.setLineDash([5,4]);ctx.strokeStyle=css('--muted');ctx.beginPath();ctx.moveTo(x0,Y(opt.target));ctx.lineTo(x1,Y(opt.target));ctx.stroke();ctx.setLineDash([]);}
+  if(opt.area){ctx.beginPath();ctx.moveTo(X(0),y1);data.forEach(function(v,i){ctx.lineTo(X(i),Y(v));});ctx.lineTo(X(n-1),y1);ctx.closePath();ctx.fillStyle=opt.color;ctx.globalAlpha=.12;ctx.fill();ctx.globalAlpha=1;}
+  ctx.strokeStyle=opt.color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();data.forEach(function(v,i){i?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v));});ctx.stroke();
+  var last=data[n-1];ctx.fillStyle=opt.color;ctx.beginPath();ctx.arc(X(n-1),Y(last),4,0,7);ctx.fill();ctx.strokeStyle=css('--card');ctx.lineWidth=2;ctx.stroke();
+  hover(g,function(x){var i=Math.round((x-x0)/(x1-x0)*(n-1));if(i<0||i>=n)return null;return opt.tip(i,data[i]);});}
+
+function drawHist(id,vals,opt){var g=setup(id),ctx=g.ctx,W=g.W,H=g.H,x0=36,y0=12,x1=W-10,y1=H-24;var bins=opt.bins,lo=opt.lo,hi=opt.hi,cnt=[];for(var b=0;b<bins;b++)cnt[b]=0;vals.forEach(function(v){var b=Math.min(bins-1,Math.max(0,Math.floor((v-lo)/(hi-lo)*bins)));cnt[b]++;});var max=Math.max.apply(null,cnt);
+  var ticks=[];for(var k=0;k<=3;k++){var v=Math.round(max*k/3);ticks.push([y1-(y1-y0)*v/max,v]);}grid(g,x0,y0,x1,y1,ticks);
+  var bw=(x1-x0)/bins;ctx.fillStyle=opt.color;cnt.forEach(function(c,b){var h=(y1-y0)*c/max;var x=x0+b*bw+1,w=bw-2;var y=y1-h;ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y+3);ctx.quadraticCurveTo(x,y,x+3,y);ctx.lineTo(x+w-3,y);ctx.quadraticCurveTo(x+w,y,x+w,y+3);ctx.lineTo(x+w,y1);ctx.closePath();ctx.fill();});
+  ctx.setLineDash([5,4]);ctx.strokeStyle=css('--muted');var tx=x0+(x1-x0)*(opt.target-lo)/(hi-lo);ctx.beginPath();ctx.moveTo(tx,y0);ctx.lineTo(tx,y1);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=css('--muted');ctx.textAlign='center';ctx.textBaseline='top';for(var k=0;k<=4;k++){var v=lo+(hi-lo)*k/4;ctx.fillText(v.toFixed(1)+' s',x0+(x1-x0)*k/4,y1+6);}
+  hover(g,function(x){var b=Math.floor((x-x0)/bw);if(b<0||b>=bins)return null;var a=lo+(hi-lo)*b/bins;return a.toFixed(2)+'–'+(a+(hi-lo)/bins).toFixed(2)+' s · '+cnt[b]+' '+T.cyc;});}
+
+function drawStates(){var g=setup('cStates'),ctx=g.ctx,W=g.W,x0=8,x1=W-8,y=30,h=28;var n=STATE.length;var col={run:css('--s3'),stop:css('--crit'),chg:css('--s4'),idle:css('--muted')};
+  ctx.fillStyle=css('--muted');ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('06:00',x0,y+h+8);ctx.textAlign='right';ctx.fillText('11:45',x1,y+h+8);ctx.textAlign='center';ctx.fillText('09:00',x0+(x1-x0)*36/69,y+h+8);
+  SEG.forEach(function(s){var a=x0+(x1-x0)*s[1]/n,b=x0+(x1-x0)*s[2]/n;ctx.fillStyle=col[s[0]];ctx.fillRect(a,y,Math.max(b-a-1,2),h);});
+  var tot={run:0,stop:0,chg:0};SEG.forEach(function(s){tot[s[0]]+=(s[2]-s[1])*5;});
+  var bars=document.getElementById('stBars');bars.innerHTML='';[['run',T.st_run,'--s3'],['stop',T.st_stop,'--crit'],['chg',T.st_chg,'--s4']].forEach(function(r){bars.innerHTML+='<div class="bar"><span>'+r[1]+'</span><div class="t"><i style="width:'+(tot[r[0]]/345*100)+'%;background:var('+r[2]+')"></i></div><span class="n">'+tot[r[0]]+' '+T.min+'</span></div>';});
+  hover(g,function(x,yy){if(yy<y||yy>y+h)return null;var i=Math.floor((x-x0)/(x1-x0)*n);var s=SEG.filter(function(s){return i>=s[1]&&i<s[2];})[0];if(!s)return null;return T['st_'+s[0]]+' · '+slotTime(s[1])+'–'+slotTime(s[2]);});}
+
+function drawWeek(){var g=setup('cWeek'),ctx=g.ctx,W=g.W,H=g.H,x0=48,y0=14,x1=W-10,y1=H-40;var n=5,gw=(x1-x0)/n,max=6000;
+  var ticks=[];for(var k=0;k<=3;k++){var v=2000*k;ticks.push([y1-(y1-y0)*v/max,v]);}grid(g,x0,y0,x1,y1,ticks,function(v){return fmt(v);});
+  WEEK.forEach(function(d,i){var cx=x0+gw*i+gw/2;var bw=Math.min(90,gw*.4);var hb=(y1-y0)*d[0]/max;ctx.fillStyle=css('--s1');ctx.fillRect(cx-bw/2,y1-hb,bw,hb);
+    ctx.fillStyle=css('--ink2');ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmt(d[0]),cx,y1-hb-3);
+    ctx.fillStyle=css('--muted');ctx.textBaseline='top';ctx.fillText(T.days[i],cx,y1+7);ctx.fillStyle=d[1]>60?css('--crit'):css('--ink2');ctx.fillText(d[1]+' '+T.min+' '+(LANG==='fr'?'perdues':'persi'),cx,y1+21);});
+  hover(g,function(x){var i=Math.floor((x-x0)/gw);if(i<0||i>=n)return null;return T.days[i]+' · '+fmt(WEEK[i][0])+' '+T.fl+' · '+WEEK[i][1]+' '+T.min;});}
+
+function drawRing(){var g=setup('cLvl'),ctx=g.ctx,c=92,r=38,p=.34;ctx.lineWidth=12;ctx.strokeStyle=css('--line2');ctx.beginPath();ctx.arc(c,c,r,0,7);ctx.stroke();ctx.strokeStyle=p<.25?css('--crit'):p<.4?css('--warn'):css('--s3');ctx.lineCap='round';ctx.beginPath();ctx.arc(c,c,r,-Math.PI/2,-Math.PI/2+p*2*Math.PI);ctx.stroke();ctx.fillStyle=css('--ink');ctx.font='600 22px "Barlow Condensed", sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('34 %',c,c);
+  document.getElementById('lvlTxt').innerHTML=T.lvl(34,'6,8',0,51);}
+
+function drawRej(){var g=setup('cRej'),ctx=g.ctx,W=g.W,H=g.H,x0=36,y0=12,x1=W-10,y1=H-24;var n=REJ.length,gw=(x1-x0)/n,max=3;
+  var ticks=[];for(var k=0;k<=3;k++)ticks.push([y1-(y1-y0)*k/max,k+' %']);grid(g,x0,y0,x1,y1,ticks);
+  ctx.setLineDash([5,4]);ctx.strokeStyle=css('--muted');ctx.beginPath();ctx.moveTo(x0,y1-(y1-y0)*1.5/max);ctx.lineTo(x1,y1-(y1-y0)*1.5/max);ctx.stroke();ctx.setLineDash([]);
+  var pc=REJ.map(function(r){return (r.plc-r.phot)/r.plc*100;});pc.forEach(function(v,i){var bw=gw*.55,x=x0+gw*i+(gw-bw)/2,h=(y1-y0)*v/max;ctx.fillStyle=v>1.5?css('--crit'):css('--s1');ctx.fillRect(x,y1-h,bw,h);ctx.fillStyle=css('--muted');ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(('0'+(6+i)).slice(-2)+':00',x0+gw*i+gw/2,y1+6);});
+  hover(g,function(x){var i=Math.floor((x-x0)/gw);if(i<0||i>=n)return null;return (6+i)+':00 · PLC '+REJ[i].plc+' · '+(LANG==='fr'?'cellule':'fotocellula')+' '+REJ[i].phot+' · '+pc[i].toFixed(1)+' %';});}
+
+function bars(id,labels,vals,color){var el=document.getElementById(id);var max=Math.max.apply(null,vals);el.innerHTML=labels.map(function(l,i){return '<div class="bar"><span>'+l+'</span><div class="t"><i style="width:'+(vals[i]/max*100)+'%;background:var('+color+')"></i></div><span class="n">'+vals[i]+'</span></div>';}).join('');}
+
+function kpis(){var k=document.getElementById('kpis');var base=[
+  [T.k_count,'4.812','',T.k_countd,''],[T.k_cad,'783','/h',T.k_cadd,'w'],[T.k_cycle,'4,6','s',T.k_cycled,''],[T.k_avail,'88','%',T.k_availd,'w'],[T.k_chg,'2:40','',T.k_chgd,'c'],[T.k_alarm,'4','',T.k_alarmd,'']];
+  var add=[[T.k_air,'6,2','bar',T.k_aird,'g'],[T.k_rej,'0,8','%',T.k_rejd,'g'],[T.k_lvl,'0:51','h',T.k_lvld,'w']];
+  var list=ADD?base.slice(0,4).concat(add,base.slice(4)):base;
+  k.innerHTML=list.map(function(r){return '<div class="kpi"><div class="l">'+r[0]+'</div><div class="v">'+(LANG==='fr'?r[1].replace('.',' '):r[1])+(r[2]?'<small>'+r[2]+'</small>':'')+'</div><div class="d '+r[4]+'">'+r[3]+'</div></div>';}).join('');}
+
+function events(){document.getElementById('events').innerHTML=T.ev.map(function(e){return '<div class="al '+e[2]+'"><div><b>'+e[1]+'</b><span>'+e[0]+'</span></div><span class="who">'+e[3]+'</span></div>';}).join('');}
+function mtable(){var t=document.getElementById('mtTable');var sv={w:'w',c:'c',i:'i',g:'i'};var lbl={w:LANG==='fr'?'à surveiller':'da tenere d\'occhio',i:LANG==='fr'?'tendance':'tendenza',g:'ok'};t.innerHTML='<tr>'+T.mth.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr>'+T.mt.map(function(r){return '<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td><span class="sev '+sv[r[4]]+'">'+lbl[r[4]]+'</span></td></tr>';}).join('');}
+
+function render(){T=I18N[LANG];document.querySelectorAll('[data-i]').forEach(function(el){var v=T[el.dataset.i];if(v!=null)el.innerHTML=v;});document.body.classList.toggle('add',ADD);
+  document.getElementById('recipeTxt').textContent=LANG==='fr'?'Flacon 50 ml · Ø 38 · bouchon à vis 24/410 · crème visage':'Flacone 50 ml · Ø 38 · tappo a vite 24/410 · crema viso';
+  kpis();events();
+  var xl=[[0,'06:00'],[12,'07:00'],[24,'08:00'],[36,'09:00'],[48,'10:00'],[60,'11:00']];
+  drawLine('cCad',CAD,{min:0,max:1000,target:800,color:css('--s1'),area:true,xlabels:xl,tip:function(i,v){return slotTime(i)+' · '+v+' '+T.fl+'/h · '+T['st_'+STATE[i]];}});
+  drawStates();drawHist('cCycle',CYC,{bins:24,lo:3.5,hi:7.5,target:4.5,color:css('--s1')});bars('alBars',T.al,ALARMS,'--s2');
+  drawWeek();
+  if(ADD){drawLine('cAir',AIR,{min:4,max:8,band:[4,5.5],color:css('--s3'),xlabels:xl,fmtY:function(v){return v.toFixed(1);},tip:function(i,v){return slotTime(i)+' · '+v.toFixed(2)+' bar';}});
+    drawLine('cCur',CUR,{min:1.6,max:2.8,target:2.4,color:css('--s2'),xlabels:[[0,T.days[0]],[40,T.days[2]],[80,T.days[4]],[120,LANG==='fr'?'Sam':'Sab']],fmtY:function(v){return v.toFixed(1)+' A';},tip:function(i,v){return v.toFixed(2)+' A · '+(LANG==='fr'?'cycle':'ciclo')+' '+(i*25);}});
+    drawLine('cVib',VIB,{min:1,max:3,target:2.6,color:css('--s4'),area:true,xlabels:[[0,'-30 g'],[15,'-15 g'],[29,LANG==='fr'?'auj.':'oggi']],fmtY:function(v){return v.toFixed(1);},tip:function(i,v){return (LANG==='fr'?'J':'G')+(i-29)+' · '+v.toFixed(2)+' mm/s';}});
+    drawLine('cTmp',TMP,{min:16,max:24,band:[16,20],color:css('--s1'),xlabels:xl,fmtY:function(v){return v.toFixed(0)+'°';},tip:function(i,v){return slotTime(i)+' · '+v.toFixed(1)+' °C';}});
+    drawRing();drawRej();mtable();}
+}
+document.getElementById('mA').onclick=function(){ADD=false;this.classList.add('on');document.getElementById('mB').classList.remove('on');render();};
+document.getElementById('mB').onclick=function(){ADD=true;this.classList.add('on');document.getElementById('mA').classList.remove('on');render();};
+document.getElementById('lIT').onclick=function(){LANG='it';this.classList.add('on');document.getElementById('lFR').classList.remove('on');render();};
+document.getElementById('lFR').onclick=function(){LANG='fr';this.classList.add('on');document.getElementById('lIT').classList.remove('on');render();};
+if(location.hash==='#fr'){LANG='fr';document.getElementById('lFR').classList.add('on');document.getElementById('lIT').classList.remove('on');}
+if(location.hash==='#sensori'||location.hash==='#capteurs'){ADD=true;document.getElementById('mB').classList.add('on');document.getElementById('mA').classList.remove('on');}
+if(window.matchMedia){window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);}
+render();
+</script>
+
+</body>
+</html>
